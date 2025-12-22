@@ -1,0 +1,224 @@
+# Installation of linuxcnc 2.9.7 on raspberrypi5
+download the image for raspberry pi5:
+https://www.linuxcnc.org/iso/image_2025-11-10-raspios-lcnc-2.9.7-6-trixie-arm64.zip
+burn it on the micro sd card
+
+https://raspberrypi-guide.github.io/getting-started/raspberry-pi-configuration
+
+```
+$ sudo raspi-config
+```
+setup hostname, password, locale, wifi, enable spi, ssh
+keyboard: generic 105 Keys,
+Layout: English(USA) - English(USA,symbolisch)
+altgr -> right alt
+compose -> left windows 
+
+# change username
+https://raspberrytips.com/change-raspberry-pi-username/
+- disable auto login
+```
+sudo raspi-config 
+```
+- set root user password
+```
+sudo passwd
+```
+- allow ssh root login
+```
+sudo nano /etc/ssh/sshd_config
+```
+set PermitRootLogin yes
+- restart ssh
+```
+sudo service ssh restart
+```
+login as root
+- change login name pi -> cnc
+```
+usermod -l cnc pi
+```
+- rename the home directory
+```
+usermod -m -d /home/cnc cnc
+```
+edit /etc/group
+change group pi -> cnc
+
+test settings by login with new username
+- remove rpi-first-boot-wizard user
+```
+sudo userdel -r rpi-first-boot-wizard
+```
+## update ssh
+```
+$ ssh-keygen
+```
+update 
+ssh/authorized_keys
+add entry in config for github,
+set git global username and email (see other place)
+```
+git config --global user.name ... 
+git config --global user.email ...
+```
+
+## update the system
+```
+sudo apt update
+sudo apt upgrade
+sudo apt autoremove 
+```
+repair the splash screen by
+edit /etc/plymouth/plymouthd.conf and set the theme to
+Theme=linuxcnc
+
+sudo update-initramfs -u
+## Install fish
+sudo apt install fish
+set it as command in terminal
+
+## Install Helix Editor
+make the clipboard working
+```
+sudo apt install xclip
+```
+install release from github
+```
+wget https://github.com/helix-editor/helix/releases/download/25.07.1/helix-25.07.1-aarch64-linux.tar.xz
+tar -xf ...
+```
+setup binary link, copy runtime,
+config:
+```
+:toggle soft-wrap.enable
+```
+gui tuning
+erscheinungsbild -> set font size
+
+
+## Install Riocore
+```
+cd prog
+git clone -v git@github.com:freylax/riocore.git
+cd riocore
+```
+the original is at
+=> https://github.com/multigcs/riocore
+
+install dependencies via apt:
+``` 
+sudo apt-get -y install python3 python3-pip python3-yaml python3-graphviz python3-pyqtgraph python3-pyqt5 python3-pyqt5.qtsvg python3-lxml python3-psutil python3-spidev
+```
+### install oss cad suite
+```
+cd ~/prog/app
+wget https://github.com/YosysHQ/oss-cad-suite-build/releases/download/2025-12-21/oss-cad-suite-linux-arm64-20251221.tgz
+tar -xf ...
+```
+and add path to ~/.profile
+```
+# set PATH to include oss_cad_suite binaries
+if [ -d "$HOME/prog/app/oss-cad-suite/bin" ] ; then
+    PATH="$HOME/prog/app/oss-cad-suite/bin:$PATH"
+fi
+```
+### install olice40prog
+```
+cd ~/prog
+git clone git@github.com:freylax/olice40prog.git
+```
+### install riocfg
+cd ~/prog
+git clone git@github.com:freylax/riocfg.git
+
+
+```
+$ mkdir prog
+$ cd prog
+$ wget -O- https://www.multixmedia.org/riocore-installer.sh | bash	
+```
+set path for toolchains
+in .
+
+## spi
+```
+$ ls -la /dev/spidev*
+$ sudo apt install spi-tools
+```
+We want to test the spi interface by applying a loopback,
+connecting MOSI(pin19) to MISO(pin21).
+```
+$ spi-config --wait --speed=500000 & PID=$!
+$ echo "Hello test" | spi-pipe -d /dev/spidev0.0 | cat
+$ kill $PID
+```
+# connecting ICE40HX8K-EVB
+following
+=> https://www.olimex.com/wiki/ICE40HX1K-EVB#Iceprog_with_Raspberry_PI
+
+
+```
+RPI5 pinout
+ |-----------------------------------|
+ | IP                  HDMI   PWR    |
+ |                                   |
+ | USB                               |
+ |                                   | 
+ | USB                               |
+ |         39...................1    |
+ |         40...................2    |
+ |-----------------------------------|
+
+
+ICE40-EVB programming connector (UEXT) pinout
+and uext cable
+ |-----|
+ | 1 2 |       brown   red
+ | 3 4 |       orange  yellow
+   5 6 |       green   blue
+ | 7 8 |       violet  white1
+ | 9 10|       white2  black
+ |-----|
+
+
+| rpi 5 |        | ICE40-EVB |            | comment         |
+|-------+--------+-----------+------------+-----------------|
+|    17 | 3v3    |         1 | 3v3        |  brown          |
+|    18 | gpio24 |         6 | creset     |  blue           |
+|    19 | mosi   |         8 | sdo        |  white1         |
+|    20 | gnd    |         2 | gnd        |  red            |
+|    21 | miso   |         7 | sdi        |  violet         |
+|    22 | gpio25 |         5 | cdone      |  green optional |
+|    23 | clk    |         9 | sck        |  white2         |
+|    24 | ce0    |        10 | #cd = ss_b |  black          |
+|    25 | gnd    |           |            |                 |
+|    26 | ce1    |           |            |                 |
+```
+flashrom is already installed.
+
+=> https://emlogic.no/2024/09/linux-drivers-getting-started-with-gpio-on-raspberry-pi-5/
+
+sudo cat /sys/kernel/debug/gpio | grep GPIO24 | sed -r 's/ *gpio-([0-9]+).*$/\1/' > gpio24
+
+gpio24 -> 595
+
+for rio-test:
+```
+ $ sudo apt install python3-spidev
+```
+
+execute rio-test:
+```
+ $ bin/rio-test olice40cfg.json /dev/spidev0.0
+```
+
+
+
+# usage
+shutdown:
+$ sudo systemctl poweroff
+
+riosetup
+$ cd prog/riocore
+$ bin/rio-setup olice40cfg.json

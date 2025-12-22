@@ -1,0 +1,101 @@
+{
+    "name": "olice40",
+    "description": "Olimex ICE40HX8K-EVB on RPI5",
+    "boardcfg": "Olimex-ICE40HX8K-EVB",
+    "protocol": "SPI",
+    "flashcmd": "/home/cnc/prog/olice40prog/write-flash.sh rio.bin",
+    "plugins": [
+        {
+            "type": "blink",
+            "pins": {
+                "led": {
+                    "pin": "OnBoard:LED2"
+                }
+            },
+            "uid": "blink0"
+        },
+        {
+            "type": "spi",
+            "pins": {
+                "mosi": {
+                    "pin": "PGM:P8"
+                },
+                "miso": {
+                    "pin": "PGM:P7"
+                },
+                "sclk": {
+                    "pin": "PGM:P9"
+                },
+                "sel": {
+                    "pin": "PGM:P10"
+                }
+            },
+            "uid": "spi0"
+        },
+        {
+            "type": "bitout",
+            "pins": {
+                "bit": {
+                    "pin": "OnBoard:LED1"
+                }
+            },
+            "uid": "bitout0",
+            "name": "Ausgabe1"
+        },
+        {
+            "type": "bitin",
+            "pins": {
+                "bit": {
+                    "pin": "OnBoard:BUT1",
+                    "pull": "up"
+                }
+            },
+            "uid": "bitin0",
+            "name": "Eingabe1"
+        },
+        {
+            "type": "bitin",
+            "pins": {
+                "bit": {
+                    "pin": "EXT:P25",
+                    "pull": ""
+                }
+            },
+            "uid": "bitin1"
+        },
+        {
+            "type": "stepdir",
+            "pins": {
+                "step": {
+                    "pin": "EXT:P31"
+                },
+                "dir": {
+                    "pin": "EXT:P29"
+                },
+                "en": {
+                    "modifier": [
+                        {
+                            "type": "invert"
+                        }
+                    ],
+                    "pin": "EXT:P33"
+                }
+            },
+            "uid": "stepdir0",
+            "is_joint": true,
+            "axis": "X",
+            "name": "XAxis"
+        }
+    ],
+    "linuxcnc": {
+        "ini": {
+            "DISPLAY": {
+                "MAX_FEED_OVERRIDE": 15.0,
+                "MAX_ANGULAR_VELOCITY": 4.98,
+                "MAX_LINEAR_VELOCITY": 75.0,
+                "DEFAULT_LINEAR_VELOCITY": 60.0
+            }
+        },
+        "machinetype": "mill"
+    }
+}
