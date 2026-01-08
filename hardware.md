@@ -9,7 +9,17 @@ Olimex ICE40 EVB 34 Pin Pinout
  | p5  p6  p7  p8  p9 p10 p11 p12 p13 p14 p15 p16 p17         |
  +------------------------------------------------------------+
 ```
-Plotter
+cnc:
+XStep p2  P29
+XDir  p3  P31
+XEn   p4  P33
+YStep p5  P34
+YDir  p6  P32
+YEn   p7  P30
+ZStep p8  P28
+ZDirc p9  P26
+ZEn   p14 P16
+plotter:
 XDir  p2  P29    X0  e1  P25
 XStep p3  P31   
 XEn   p4  P33
