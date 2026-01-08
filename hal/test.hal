@@ -1,0 +1,64 @@
+
+# load the realtime components
+#loadrt [KINS]KINEMATICS
+#loadrt tpmod
+#loadrt homemod
+#loadrt [EMCMOT]EMCMOT base_period_nsec=[EMCMOT]BASE_PERIOD servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS num_dio=[EMCMOT]NUM_DIO num_aio=[EMCMOT]NUM_AIO
+loadrt threads name1=base-thread period1=[EMCMOT]BASE_PERIOD name2=servo-thread period2=[EMCMOT]SERVO_PERIOD fp2=1
+
+loadrt rio
+addf rio.readwrite servo-thread
+
+# if you need to test rio without hardware, set it to 1
+setp rio.sys-simulation 0
+
+loadrt pid names=pid
+addf pid.do-pid-calcs servo-thread
+
+loadrt mux2 names=vmux
+addf vmux servo-thread
+
+
+loadusr -Wn gui pyvcp -c gui test-gui.xml
+net sig_enable <= gui.enable
+net sig_enable => rio.XAxis.enable
+net sig_enable => pid.enable
+
+net sig_use_pid <= gui.use-pid
+net sig_use_pid => vmux.sel
+
+net sig_velocity_req <= gui.velocity-req
+net sig_velocity_req => vmux.in0
+
+net sig_velocity_pid <= pid.output
+net sig_velocity_pid => vmux.in1
+
+net sig_velocity <= vmux.out
+net sig_velocity => rio.XAxis.velocity
+net sig_velocity => gui.velocity
+
+net sig_pos_req <= gui.pos-req
+net sig_pos_req => pid.command
+
+net sig_pos <= rio.XAxis.position
+net sig_pos => gui.pos
+net sig_pos => pid.feedback
+
+net sig_scale <= gui.scale
+net sig_scale => rio.XAxis.position-scale
+net sig_scale => rio.XAxis.velocity-scale
+
+net sig_P <= gui.P
+net sig_P => pid.Pgain
+
+net sig_I <= gui.I
+net sig_I => pid.Igain
+
+net sig_D <= gui.D
+net sig_D => pid.Dgain
+
+setp rio.machine-on true
+setp rio.sys-enable true
+setp rio.sys-enable-request true
+
+start
