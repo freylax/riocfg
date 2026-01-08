@@ -214,6 +214,8 @@ execute rio-test:
 ```
 
 
+cd prog/riocore
+sudo halcompile --install riocore/files/rio.c
 
 # usage
 shutdown:
@@ -222,3 +224,7 @@ $ sudo systemctl poweroff
 riosetup
 $ cd prog/riocore
 $ bin/rio-setup olice40cfg.json
+
+python
+  gpiod
+  
