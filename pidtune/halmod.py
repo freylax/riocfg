@@ -63,6 +63,12 @@ class HalPin:
         Call read_value to update the value form the hal """        
         hal.set_p(self.name,str(value))        
 
+    def write_value_str(self, value:str)-> None:
+        """Write the given pin value provided as string to the hal.
+        This does not alter the current value of this object.
+        Call read_value to update the value form the hal """        
+        hal.set_p(self.name,value)        
+
 def dict_to_HalPin(d:dict) -> HalPin:
     return HalPin(
         name = str(d.get('NAME')),
@@ -95,3 +101,10 @@ def get_pins(select:list[str], dir:PinDir=PinDir.IN_OUT, reread:bool=False)->lis
             if p.name.startswith(s) and p.dir.value & dir.value == p.dir.value:
                 l.append(p)
     return l
+
+def get_pin(name:str, reread:bool=False) -> HalPin | None:
+    pins = get_all_pins(reread)
+    for p in pins:
+        if p.name == name:
+            return p
+    return None
