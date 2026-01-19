@@ -9,8 +9,8 @@ addf rio.readwrite servo-thread
 # if you need to test rio without hardware, set it to 1
 setp rio.sys-simulation 0
 
-#loadrt pid names=pid
-#addf pid.do-pid-calcs servo-thread
+loadrt pid names=pid
+addf pid.do-pid-calcs servo-thread
 
 # loadrt time
 # addf time.0 servo-thread

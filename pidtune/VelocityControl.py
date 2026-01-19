@@ -8,11 +8,10 @@ from halmod import get_pin,HalPin
 
 class VelocityControl(Static):
 
-    CSS = """
+    DEFAULT_CSS = """
     VelocityControl{
-        height: 3
-        align: center top;
-        border: round green;
+        height: 3;
+        border: round;
         
         Horizontal {
             margin-left: 1;               
@@ -38,13 +37,14 @@ class VelocityControl(Static):
             yield Input(type='number',compact=True)            
 
     def on_mount(self) -> None:
+        ...
+    def activate(self) -> None:
         input = self.query_one(Input)
         self.velocity_pin.read_value()
         input.value = str( self.velocity_pin.value)
 
-    def activate(self) -> None:
-        self.enable_pin.disconnect()
-        self.velocity_pin.disconnect()            
+    def deactivate(self) -> None:
+        ...
         
     def on_radio_button_changed(self,m:RadioButton.Changed) -> None:
         if m.control.id == 'active':

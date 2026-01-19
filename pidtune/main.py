@@ -11,6 +11,7 @@ from PinTable import PinTable
 from PinInput import PinInput
 from VelocityControl import VelocityControl
 from TrapVelControl import TrapVelControl
+from PidControl import PidControl
 from halmod import get_pins
 
 import linuxcnc
@@ -31,10 +32,12 @@ class PidTuneApp(App):
         with Horizontal():
             yield PinTable()
             with TabbedContent():
-                with TabPane("VeloCtrl",id="velctrl"):
+                with TabPane("VeloCtrl",id='velctrl'):
                     yield VelocityControl()
                 with TabPane("TrapVel",id='trapvel'):
                     yield TrapVelControl()
+                with TabPane("Pid",id='pid'):
+                    yield PidControl()
                 with TabPane("Log",id='log'):
                     yield RichLog()
         yield Footer()
@@ -45,7 +48,7 @@ class PidTuneApp(App):
 
     def load_pins(self) -> None:
         t = self.query_one(PinTable)
-        t.pins = get_pins( ['trapvel','rio.sys-enable','rio.XAxis'])
+        t.pins = get_pins( ['trapvel','rio.sys-enable','rio.XAxis','pid'])
          
     def get_system_commands(self, screen: Screen) -> Iterable[SystemCommand]:
         yield from super().get_system_commands(screen)  
@@ -53,21 +56,13 @@ class PidTuneApp(App):
 
     def on_tabbed_content_tab_activated(self, m:TabbedContent.TabActivated) -> None:
         tab_id = m.tab.id
-        if tab_id.endswith('velctrl'):
-            self.query_one(VelocityControl).activate()
-        elif tab_id.endswith('trapvel'): 
-            tc = self.query_one( TrapVelControl)
-            vc = self.query_one( VelocityControl)
-            tc.activate()
-            l = self.query_one(RichLog)
-            l.write(f"sig:{tc.trapvel_current_pos.signal},{vc.rio_pos.signal}")
-         
-    # def on_pin_table_selected(self, m:PinTable.Selected)->None:
-    #     input = self.query_one(PinInput)
-    #     input.pin = m.pin
-    #     self.set_focus(input,scroll_visible=True)
-
-#    def on_input_submitted(self, message:Input.Submitted)->None:
+        vc=self.query_one( VelocityControl)
+        tv=self.query_one( TrapVelControl)
+        pd=self.query_one( PidControl)
+        for c in [vc,tv,pd]: c.deactivate()
+        if tab_id.endswith('velctrl'): vc.activate()
+        elif tab_id.endswith('trapvel'): tv.activate()
+        elif tab_id.endswith('pid'): pd.activate()
         
 
 if __name__ == "__main__":
