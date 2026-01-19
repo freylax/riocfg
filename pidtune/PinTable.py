@@ -13,11 +13,13 @@ from rich.text import Text
 
 from halmod import PinDir, PinType, HalPin
 
-pin_on  = Text.from_markup(':new_moon:',justify='center')
-pin_off = Text.from_markup(':full_moon:',justify='center')    
-dir_in  = Text.from_markup(':right_arrow_curving_left:',justify='center') 
-dir_out = Text.from_markup(':left_arrow_curving_right:',justify='center') 
-dir_in_out = Text.from_markup(':left_right_arrow:',justify='center') 
+pin_on  = Text.from_markup(':new_moon:',justify='left')
+pin_off = Text.from_markup(':full_moon:',justify='left')    
+dir_in  = Text.from_markup(':right_arrow_curving_left:',justify='right',style="green") 
+dir_out = Text.from_markup(':left_arrow_curving_right:',justify='right') 
+dir_in_con = Text.from_markup(':zap::right_arrow_curving_left:',justify='right') 
+dir_out_con = Text.from_markup(':zap::left_arrow_curving_right:',justify='right') 
+dir_in_out = Text.from_markup(':zap::left_right_arrow:',justify='right') 
 
 class DataInput(Input):
     """Our cell edit widget, leave with return or escape"""
@@ -55,8 +57,12 @@ def pin_val_to_cell( p:HalPin) -> Text:
 
 def pin_dir_to_cell( p:HalPin) -> Text:
     match p.dir:
-        case PinDir.IN: return dir_in
-        case PinDir.OUT: return dir_out
+        case PinDir.IN:
+            if p.signal is None: return dir_in
+            else: return dir_in_con    
+        case PinDir.OUT:
+            if p.signal is None: return dir_out
+            else: return dir_out_con
         case PinDir.IN_OUT: return dir_in_out
         
 class PinTable(Widget):
@@ -80,7 +86,8 @@ class PinTable(Widget):
         table= self.query_one(DataTable)
         table.cursor_type = "row"
         table.zebra_stripes = True
-        self.column_keys = table.add_columns(('Pin','pin'),(dir_in_out,'dir'),('Value','value'))
+        self.column_keys = table.add_columns(('Pin','pin'),(dir_in_out,'dir'),('Value','value'),
+                                             ('Signal','signal'))
         self.set_interval(1,self.update_pins)
         input = self.query_one(DataInput)
         input.display = False
@@ -97,6 +104,7 @@ class PinTable(Widget):
             return
         pin=self.pins[m.cursor_row]
         if pin.dir is PinDir.OUT: return
+        if isinstance( pin.signal, str): return
         val_idx = table.get_column_index('value')
         c = Coordinate(row=m.cursor_row,column=val_idx)
         if pin.type is PinType.BOOL:
@@ -131,6 +139,7 @@ class PinTable(Widget):
             table = self.query_one(DataTable)
             pin=self.pins[table.cursor_row]
             if pin.dir is PinDir.OUT: return
+            if isinstance(pin.signal,str): return
             val_idx = table.get_column_index('value')
             c = Coordinate(row=table.cursor_row,column=val_idx)
             if pin.type is PinType.BOOL:
@@ -165,8 +174,18 @@ class PinTable(Widget):
         for row,pin in enumerate(self.pins):
             if pin.read_value():
                 val_idx = table.get_column_index('value')
-                coord = Coordinate( row, val_idx)
+                val_crd = Coordinate( row, val_idx)
                 v = pin_val_to_cell(pin)
                 if not worker.is_cancelled:
-                    self.app.call_from_thread( table.update_cell_at,coord,value=v)
-    
+                    self.app.call_from_thread( table.update_cell_at,val_crd,value=v)
+            dir_idx = table.get_column_index('dir')
+            dir_crd = Coordinate( row, dir_idx)
+            sig_idx = table.get_column_index('signal')
+            sig_crd = Coordinate( row, sig_idx)
+            d = pin_dir_to_cell(pin)
+            s =''
+            if isinstance(pin.signal,str): s=pin.signal
+            if not worker.is_cancelled:
+                self.app.call_from_thread( table.update_cell_at,dir_crd,value=d)
+                self.app.call_from_thread( table.update_cell_at,sig_crd,value=s)
+                    

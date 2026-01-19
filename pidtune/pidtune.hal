@@ -1,0 +1,22 @@
+
+# loadrt threads name1=base-thread period1=[EMCMOT]BASE_PERIOD name2=servo-thread period2=[EMCMOT]SERVO_PERIOD fp2=1
+
+loadrt threads name1=base-thread period1=0 name2=servo-thread period2=1000000 fp2=1
+
+loadrt rio
+addf rio.readwrite servo-thread
+
+# if you need to test rio without hardware, set it to 1
+setp rio.sys-simulation 0
+
+#loadrt pid names=pid
+#addf pid.do-pid-calcs servo-thread
+
+# loadrt time
+# addf time.0 servo-thread
+
+loadrt trapvel names=trapvel 
+addf trapvel servo-thread
+# net enable-x trapvel.enable-ampl rio.XAxis.enable
+# net vel-x trapvel.velocity rio.XAxis.velocity
+# net pos-x rio.XAxis.position trapvel.current-pos

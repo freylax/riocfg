@@ -26,6 +26,7 @@ class VelocityControl(Static):
     
     enable_pin = get_pin('rio.XAxis.enable')
     velocity_pin = get_pin('rio.XAxis.velocity')
+    rio_pos = get_pin('rio.XAxis.position')
         
     def compose(self) -> ComposeResult:
         assert isinstance( self.enable_pin, HalPin), "pin check"

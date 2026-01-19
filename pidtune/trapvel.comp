@@ -1,0 +1,99 @@
+component trapvel "from distanz calc trapezoidal velocity profile";
+
+description
+
+"""
+This realtime component calculates a trapezodial velocity profile for
+a given distance, maximal velocity and acceleration.
+    
+""";
+
+author "Robert y";
+license "GPL";
+ 
+// Input Pins
+pin in bit enable = 0 "Enable the controler";
+pin in float target_pos = 0.0 "Target distance in length units";
+pin in float current_pos = 0.0 "Current positon in length units";
+pin in float acceleration = 1.0 "Acceleration in length unit/sec^2";
+pin in float max_velocity = 1.0 "Maximal velocity in length unit/sec";
+pin in float pos_error = 0.01 "accepted position error";
+
+// Output Pins
+pin out u32 mode "0 - standby, 1 - speed up, 2 - max speed, 3 - speed down";
+pin out float velocity "Output velocity";
+pin out bit enable_ampl;
+// Global Variables
+variable float dir = 0.0;
+
+function _;
+
+;;
+#include "rtapi_math.h"
+
+FUNCTION(_) {
+    // rtapi_u32 totalseconds;
+        
+    if( !enable) {
+        if( velocity != 0) {
+            // break the movement
+            velocity = 0;
+            enable_ampl = 0;
+            mode = 0;
+        }
+        return;
+    }
+
+    
+    float l = 0.0;
+    if( target_pos > current_pos) {
+        // velocity is positiv
+        l = target_pos - current_pos;
+        dir = +1.0;
+    } else {
+        // negativ velocity
+        l = current_pos - target_pos;
+        dir = -1.0;
+    }
+    // calculate length of deacceleration
+    float v_abs = fabs(velocity);
+    float l_break = 0.5 * v_abs * v_abs / acceleration; 
+    // enabled
+    if( mode == 0) {
+        if( l <= pos_error) return;
+        // start movement
+        mode = 1; // start acceleration
+        enable_ampl = 1;
+    }
+    float dt = period * 0.000000001;
+    if( mode == 1) {
+        // acceleration
+        if( l_break >= l) { mode = 3; }
+        else if( v_abs >= max_velocity) { mode = 2; }
+        else {
+            velocity = dir * ( v_abs + dt * acceleration);
+            return;
+        }
+    }
+    if( mode == 2) {
+        // max velocity
+        if( l_break >= l) { mode = 3; }
+        else {
+            velocity = dir * max_velocity;
+            return;
+        }
+    }
+    if( mode == 3) {
+        // deacceleration
+        if( l <= pos_error) {
+            // target reached
+            mode = 0;
+            enable_ampl = 0;
+        } else {
+            velocity = dir * ( v_abs - dt * acceleration);
+        }
+    }
+}
+
+
+
