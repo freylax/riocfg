@@ -228,3 +228,4 @@ $ bin/rio-setup olice40cfg.json
 python
   gpiod
   
+sudo halcompile --install riocore/files/rio.c
