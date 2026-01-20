@@ -18,8 +18,8 @@ addf pid.do-pid-calcs servo-thread
 loadrt mux2 names=vmux
 addf vmux servo-thread
 
-
 loadusr -Wn gui pyvcp -c gui test-gui.xml
+
 net sig_enable <= gui.enable
 net sig_enable => rio.XAxis.enable
 net sig_enable => pid.enable
@@ -56,6 +56,9 @@ net sig_I => pid.Igain
 
 net sig_D <= gui.D
 net sig_D => pid.Dgain
+
+net sig_maxout <= gui.maxout
+net sig_maxout => pid.maxoutput
 
 setp rio.machine-on true
 setp rio.sys-enable true

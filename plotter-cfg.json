@@ -1,0 +1,248 @@
+{
+    "name": "plotter",
+    "description": "Plotter configuration with Olimex ICE40HX8K-EVB on RPI",
+    "boardcfg": "Olimex-ICE40HX8K-EVB",
+    "rpi5": true,
+    "protocol": "SPI",
+    "flashcmd": "/home/cnc/prog/olice40prog/spiflash.py -b rio.bin",
+    "plugins": [
+        {
+            "type": "blink",
+            "pins": {
+                "led": {
+                    "pin": "OnBoard:LED2"
+                }
+            },
+            "uid": "blink0"
+        },
+        {
+            "type": "spi",
+            "pins": {
+                "mosi": {
+                    "pin": "PGM:P8"
+                },
+                "miso": {
+                    "pin": "PGM:P7"
+                },
+                "sclk": {
+                    "pin": "PGM:P9"
+                },
+                "sel": {
+                    "pin": "PGM:P10"
+                }
+            },
+            "uid": "spi0",
+            "name": "spiconnection"
+        },
+        {
+            "type": "bitout",
+            "pins": {
+                "bit": {
+                    "pin": "OnBoard:LED1"
+                }
+            },
+            "uid": "bitout0",
+            "name": "Ausgabe1"
+        },
+        {
+            "type": "bitin",
+            "pins": {
+                "bit": {
+                    "pin": "OnBoard:BUT1",
+                    "pull": "up"
+                }
+            },
+            "uid": "bitin0",
+            "name": "Eingabe1"
+        },
+        {
+            "type": "stepdir",
+            "pins": {
+                "step": {
+                    "pin": "EXT:P31"
+                },
+                "dir": {
+                    "pin": "EXT:P29"
+                },
+                "en": {
+                    "modifier": [
+                        {
+                            "type": "invert"
+                        }
+                    ],
+                    "pin": "EXT:P33"
+                }
+            },
+            "uid": "stepdir0",
+            "is_joint": true,
+            "axis": "X",
+            "name": "XAxis",
+            "signals": {
+                "enable": {
+                    "net": ""
+                }
+            },
+            "joint": {
+                "scale": 48.0,
+                "max_velocity": 5.0,
+                "max_acceleration": 10.0,
+                "stepgen_maxaccel": 12.0,
+                "min_limit": -10.0,
+                "max_limit": 300.0,
+                "pid_p": 25.0,
+                "pid_deadband": 1.0,
+                "min_ferror": 1.0
+            }
+        },
+        {
+            "type": "stepdir",
+            "pins": {
+                "step": {
+                    "pin": "EXT:P32"
+                },
+                "dir": {
+                    "pin": "EXT:P34"
+                },
+                "en": {
+                    "modifier": [
+                        {
+                            "type": "invert"
+                        }
+                    ],
+                    "pin": "EXT:P30"
+                }
+            },
+            "uid": "stepdir1",
+            "is_joint": true,
+            "axis": "Y",
+            "name": "YAXIS"
+        },
+        {
+            "type": "stepdir",
+            "pins": {
+                "step": {
+                    "pin": "EXT:P12"
+                },
+                "dir": {
+                    "pin": "EXT:P28"
+                },
+                "en": {
+                    "modifier": [
+                        {
+                            "type": "invert"
+                        }
+                    ],
+                    "pin": "EXT:P16"
+                }
+            },
+            "uid": "stepdir2",
+            "is_joint": true,
+            "axis": "Z",
+            "name": "ZAXIS"
+        },
+        {
+            "type": "bitin",
+            "pins": {
+                "bit": {
+                    "pin": "EXT:P25"
+                }
+            },
+            "uid": "bitin1",
+            "name": "X0",
+            "signals": {
+                "bit": {
+                    "display": {
+                        "title": "X0",
+                        "initval": true,
+                        "type": "led"
+                    },
+                    "net": "joint.0.home-sw-in"
+                }
+            }
+        },
+        {
+            "type": "bitin",
+            "pins": {
+                "bit": {
+                    "pin": "EXT:P23"
+                }
+            },
+            "uid": "bitin2",
+            "name": "Y0",
+            "signals": {
+                "bit": {
+                    "display": {
+                        "title": "Y0",
+                        "initval": true,
+                        "type": "led"
+                    },
+                    "net": "joint.1.home-sw-in"
+                }
+            }
+        },
+        {
+            "type": "bitin",
+            "pins": {
+                "bit": {
+                    "pin": "EXT:P21"
+                }
+            },
+            "uid": "bitin3",
+            "name": "Z0",
+            "signals": {
+                "bit": {
+                    "display": {
+                        "title": "Z0",
+                        "initval": true,
+                        "type": "led"
+                    },
+                    "net": "joint.2.home-sw-in"
+                }
+            }
+        },
+        {
+            "type": "bitin",
+            "pins": {
+                "bit": {
+                    "pin": "EXT:P19"
+                }
+            },
+            "uid": "bitin4",
+            "name": "Stop",
+            "signals": {
+                "bit": {
+                    "display": {
+                        "title": "Not Aus",
+                        "type": "led"
+                    },
+                    "net": ""
+                }
+            }
+        },
+        {
+            "type": "bitout",
+            "pins": {
+                "bit": {
+                    "pin": "EXT:P26"
+                }
+            },
+            "uid": "bitout1",
+            "name": "p26"
+        }
+    ],
+    "linuxcnc": {
+        "ini": {
+            "DISPLAY": {
+                "MAX_FEED_OVERRIDE": 15.0,
+                "MAX_ANGULAR_VELOCITY": 4.98,
+                "MAX_LINEAR_VELOCITY": 10.0,
+                "DEFAULT_LINEAR_VELOCITY": 5.0,
+                "SPINDLES": 1
+            },
+            "KINS": {
+                "JOINTS": 3
+            }
+        },
+        "machinetype": "mill"
+    }
+}

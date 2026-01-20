@@ -16,9 +16,10 @@
       </label>
       <spinbox>
         <halpin>"velocity-req"</halpin>
-        <min_>-30</min_>
-        <max_>30</max_>
+        <min_>-100</min_>
+        <max_>100</max_>
         <initval>0</initval>
+        <format>"3.1f"</format>
         <resolution>0.1</resolution>
         <param_pin>1</param_pin>
       </spinbox>
@@ -29,10 +30,11 @@
       </label>
       <spinbox>
         <halpin>"pos-req"</halpin>
-        <min_>-100</min_>
-        <max_>100</max_>
+        <min_>-500</min_>
+        <max_>500</max_>
         <initval>0</initval>
         <resolution>1</resolution>
+        <format>"3.0f"</format>
         <param_pin>1</param_pin>
       </spinbox>
       <label>
@@ -40,7 +42,7 @@
       </label>
       <number>
         <halpin>"pos"</halpin>
-        <format>"3.1f"</format>
+        <format>"4.1f"</format>
       </number>
       <label>
         <text>"velocity:"</text>
@@ -51,42 +53,59 @@
       </number>
     </hbox>
     <hbox>
-      <label>
-        <text>"scale:"</text>
-      </label>
-      <spinbox>
-        <halpin>"scale"</halpin>
-        <max_>300</max_>
-        <initval>1</initval>
-        <resolution>1</resolution>
-      </spinbox>
-      <label>
-        <text>"P:"</text>
-      </label>
-      <spinbox>
-        <halpin>"P"</halpin>
-        <max_>100</max_>
-        <initval>1</initval>
-        <resolution>0.1</resolution>
-      </spinbox>
-      <label>
-        <text>"I:"</text>
-      </label>
-      <spinbox>
-        <halpin>"I"</halpin>
-        <max_>100</max_>
-        <initval>0</initval>
-        <resolution>0.1</resolution>
-      </spinbox>
-      <label>
-        <text>"D:"</text>
-      </label>
-      <spinbox>
-        <halpin>"D"</halpin>
-        <max_>100</max_>
-        <initval>0</initval>
-        <resolution>0.1</resolution>
-      </spinbox>
+      <labelframe text = "RIO settings">
+        <table>
+          <tablerow/>
+            <label text="scale:"/>
+            <spinbox>
+              <halpin>"scale"</halpin>
+              <max_>300</max_>
+              <initval>1</initval>
+              <format>"3.0f"</format>
+              <resolution>1</resolution>
+            </spinbox>
+        </table>
+      </labelframe>  
+      <labelframe text = "PID settings">
+        <table uniform_rows="ab">
+          <tablerow/>
+            <label text="P:"/>
+            <spinbox>
+              <halpin>"P"</halpin>
+              <max_>100</max_>
+              <initval>1</initval>
+              <format>"3.1f"</format>
+              <resolution>0.1</resolution>
+            </spinbox>
+          <tablerow/>
+            <label text="I:"/>
+            <spinbox>
+              <halpin>"I"</halpin>
+              <max_>100</max_>
+              <initval>0</initval>
+              <format>"3.1f"</format>
+              <resolution>0.1</resolution>
+            </spinbox>
+          <tablerow/>
+            <label text="D:"/>
+            <spinbox>
+              <halpin>"D"</halpin>
+              <max_>100</max_>
+              <initval>0</initval>
+              <format>"3.1f"</format>
+              <resolution>0.1</resolution>
+            </spinbox>
+          <tablerow/>
+            <label text="maxout"/>
+            <spinbox>
+              <halpin>"maxout"</halpin>
+              <max_>100</max_>
+              <initval>0</initval>
+              <format>"3.1f"</format>
+              <resolution>0.1</resolution>
+            </spinbox>
+        </table>
+      </labelframe>
     </hbox>
   </vbox>
 </pyvcp>
