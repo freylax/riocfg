@@ -44,8 +44,8 @@ class PidTuneApp(App):
                     yield VelocityControl()
                 with TabPane("TrapVel", id="trapvel"):
                     yield TrapVelControl()
-                with TabPane("Pid", id="pid"):
-                    yield PidControl()
+                # with TabPane("Pid", id="pid"):
+                #     yield PidControl()
                 with TabPane("Log", id="log"):
                     yield RichLog()
         yield Footer()
@@ -56,7 +56,8 @@ class PidTuneApp(App):
 
     def load_pins(self) -> None:
         t = self.query_one(PinTable)
-        t.pins = get_pins(["trapvel", "rio.sys-enable", "rio.XAxis", "pid"])
+        t.pins = get_pins([ "trapvel", "rio.sys-enable", "rio.XAxis"])
+        # t.pins = get_pins(["trapvel", "rio.sys-enable", "rio.XAxis", "pid"])
 
     def get_system_commands(self, screen: Screen) -> Iterable[SystemCommand]:
         yield from super().get_system_commands(screen)
@@ -66,15 +67,15 @@ class PidTuneApp(App):
         tab_id = m.tab.id
         vc = self.query_one(VelocityControl)
         tv = self.query_one(TrapVelControl)
-        pd = self.query_one(PidControl)
-        for c in [vc, tv, pd]:
+        # pd = self.query_one(PidControl)
+        for c in [vc, tv]: #, pd]:
             c.deactivate()
         if tab_id.endswith("velctrl"):
             vc.activate()
         elif tab_id.endswith("trapvel"):
             tv.activate()
-        elif tab_id.endswith("pid"):
-            pd.activate()
+        # elif tab_id.endswith("pid"):
+            # pd.activate()
 
 
 if __name__ == "__main__":

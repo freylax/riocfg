@@ -61,11 +61,12 @@ class HalPin:
     type: PinType
     # value: Value
     # signal: None | str
-    def __init__(self,name: str,dir:PinDir,type:PinType,value):
+    def __init__(self,name: str,dir:PinDir,type:PinType,value,signal:None | str):
         self.name = name
         self.dir = dir
         self.type = type
         self._value = create_HalPin_value(type,value)
+        self._signal = signal
         
     @property
     def value(self):
@@ -77,14 +78,16 @@ class HalPin:
 
     @property
     def signal(self) -> str|None:
-        return get_pin_signal(self.name)
+        return self._signal
+        #return get_pin_signal(self.name)
 
     @signal.setter
     def signal(self, signal:str|None):
-        if signal is None:
-            remove_pin_signal(self.name)
-        else:
-            set_pin_signal(self.name, signal)   
+        self._signal = signal
+        # if signal is None:
+        #     remove_pin_signal(self.name)
+        # else:
+        #     set_pin_signal(self.name, signal)   
 
     def read_value(self) -> bool:
         """Update the pin value by request the value of the hal pin.
@@ -132,7 +135,8 @@ def dict_to_HalPin(d:dict) -> HalPin:
         name = str(d.get('NAME')),
         dir = PinDir(d.get('DIRECTION')),
         type= PinType(d.get('TYPE')),
-        value= d.get('VALUE'))
+        value= d.get('VALUE'),
+        signal= d.get('SIGNAL'))
 
 _ini_component = None
 

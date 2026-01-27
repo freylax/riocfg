@@ -8,3 +8,12 @@ which contains one line
 ```
 
 uv tool install mypy@latest
+
+
+/usr/lib/linuxcnc/modules/hal_lib.so
+
+
+
+edit halcomp.cc
+linuxcnc/src
+make ../lib/python/_hal.so
